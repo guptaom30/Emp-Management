@@ -1,0 +1,98 @@
+npx create-react-app employee-manager
+cd employee-manager
+npm install axios
+import axios from 'axios';
+
+export default axios.create({
+    baseURL: 'http://localhost:8080/api/employees',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+import React, { useEffect, useState } from 'react';
+import api from '../api';
+
+const EmployeeList = () => {
+    const [employees, setEmployees] = useState([]);
+
+    useEffect(() => {
+        const fetchEmployees = async () => {
+            const response = await api.get('/');
+            setEmployees(response.data);
+        };
+
+        fetchEmployees();
+    }, []);
+
+    return (
+        <div>
+            <h2>Employee List</h2>
+            <ul>
+                {employees.map((employee) => (
+                    <li key={employee.id}>
+                        {employee.name} - {employee.role} - {employee.department} - {employee.salary}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+export default EmployeeList;
+import React, { useState } from 'react';
+import api from '../api';
+
+const EmployeeForm = () => {
+    const [employee, setEmployee] = useState({ name: '', role: '', department: '', salary: '' });
+
+    const handleChange = (e) => {
+        setEmployee({ ...employee, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await api.post('/', employee);
+        setEmployee({ name: '', role: '', department: '', salary: '' });
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <div>
+                <label>Name</label>
+                <input type="text" name="name" value={employee.name} onChange={handleChange} />
+            </div>
+            <div>
+                <label>Role</label>
+                <input type="text" name="role" value={employee.role} onChange={handleChange} />
+            </div>
+            <div>
+                <label>Department</label>
+                <input type="text" name="department" value={employee.department} onChange={handleChange} />
+            </div>
+            <div>
+                <label>Salary</label>
+                <input type="number" name="salary" value={employee.salary} onChange={handleChange} />
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    );
+};
+
+export default EmployeeForm;
+import React from 'react';
+import EmployeeList from './components/EmployeeList';
+import EmployeeForm from './components/EmployeeForm';
+
+const App = () => {
+    return (
+        <div>
+            <h1>Employee Manager</h1>
+            <EmployeeForm />
+            <EmployeeList />
+        </div>
+    );
+};
+
+export default App;
+./mvnw spring-boot:run
+npm start
